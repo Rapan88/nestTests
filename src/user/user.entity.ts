@@ -4,10 +4,13 @@ import {hash} from 'bcrypt'
 @Entity()
 export default class UserEntity {
     @PrimaryGeneratedColumn()
-    private id: number
+    id: number
 
     @Column()
     email: string
+
+    @Column({default: ''})
+    username: string
 
     @Column({default: ''})
     bio: string
