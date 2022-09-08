@@ -45,7 +45,6 @@ export class UserService {
                 ...user,
                 token: this.generateJwt(user)
             }
-
         }
     }
 
