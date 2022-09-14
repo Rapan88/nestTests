@@ -49,7 +49,7 @@ export class ArticleService {
         return await this.articleRepository.delete({slug})
     }
 
-    async putArticle(slug: string, currentUserId: number, newArticle: ArticleEntity): Promise<ArticleResponseInterface> {
+    async putArticle(slug: string, currentUserId: number, newArticle: CreateArticleDto): Promise<ArticleResponseInterface> {
         const article = await this.getArticleBySlug(slug)
 
         if (!article) {
