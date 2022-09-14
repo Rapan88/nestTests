@@ -41,13 +41,28 @@ export class ArticleService {
         if (!article) {
             throw new HttpException("Article does not exist", HttpStatus.NOT_FOUND)
         }
-        console.log(article)
 
         if (article.author.id !== currentUserId) {
             throw new HttpException("You are not author", HttpStatus.FORBIDDEN)
         }
 
         return await this.articleRepository.delete({slug})
+    }
+
+    async putArticle(slug: string, currentUserId: number, newArticle: ArticleEntity): Promise<ArticleResponseInterface> {
+        const article = await this.getArticleBySlug(slug)
+
+        if (!article) {
+            throw new HttpException("Article does not exist", HttpStatus.NOT_FOUND)
+        }
+
+        if (article.author.id !== currentUserId) {
+            throw new HttpException("You are not author", HttpStatus.FORBIDDEN)
+        }
+
+        const result = await this.articleRepository.save(Object.assign(article, newArticle))
+        return this.buildArticleResponse(result)
+
     }
 
     buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {
