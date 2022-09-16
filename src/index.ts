@@ -1,6 +1,7 @@
 import "reflect-metadata"
 import {DataSource} from "typeorm";
 import User from "./user/user.entity"
+import {ArticleEntity} from "./article/article.entity";
 
 
 const AppDataSource = new DataSource({
@@ -10,10 +11,11 @@ const AppDataSource = new DataSource({
     username: "root",
     password: "1111",
     database: "testNodeNest",
-    entities: [User],
+    entities: [User, ArticleEntity],
     synchronize: true,
     logging: false,
 })
+
 
 AppDataSource.initialize()
     .then(() => {

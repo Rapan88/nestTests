@@ -3,15 +3,40 @@ import UserEntity from "../user/user.entity";
 import {CreateArticleDto} from "../dto/createArticle.dto";
 import {ArticleEntity} from "./article.entity";
 import {InjectRepository} from "@nestjs/typeorm";
-import {DeleteResult, Repository} from "typeorm";
+import {DeleteResult, getConnection, getConnectionManager, getRepository, Repository} from "typeorm";
 import {ArticleResponseInterface} from "../types/articleResponse.interface";
 import slugify from 'slugify'
+import {ArticlesResponseInterface} from "../types/articlesResponse.interface";
+import {typeOrmConfigAsync} from "../config/typeorm.config";
 
 @Injectable()
 export class ArticleService {
 
     constructor(@InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>) {
+    }
 
+    async findAll(currentUserId: number, query: any):Promise<ArticlesResponseInterface> {
+
+        const queryBuilder = getRepository(ArticleEntity)
+            .createQueryBuilder('articles')
+            .leftJoinAndSelect('articles.author', 'author')
+
+        queryBuilder.orderBy('articles.createdAt', 'DESC')
+
+        const articlesCount = await queryBuilder.getCount()
+
+
+        if(query.limit){
+            queryBuilder.limit(query.limit)
+        }
+
+        if(query.offset){
+            queryBuilder.offset(query.offset)
+        }
+
+        const articles = await queryBuilder.getMany()
+
+        return  {articles, articlesCount}
     }
 
 
