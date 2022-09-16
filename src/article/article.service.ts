@@ -7,7 +7,7 @@ import {DeleteResult, getConnection, getConnectionManager, getRepository, Reposi
 import {ArticleResponseInterface} from "../types/articleResponse.interface";
 import slugify from 'slugify'
 import {ArticlesResponseInterface} from "../types/articlesResponse.interface";
-import {typeOrmConfigAsync} from "../config/typeorm.config";
+import {TypeOrmConfig, typeOrmConfigAsync} from "../config/typeorm.config";
 
 @Injectable()
 export class ArticleService {
@@ -17,7 +17,7 @@ export class ArticleService {
 
     async findAll(currentUserId: number, query: any):Promise<ArticlesResponseInterface> {
 
-        const queryBuilder = getRepository(ArticleEntity)
+        const queryBuilder = this.articleRepository
             .createQueryBuilder('articles')
             .leftJoinAndSelect('articles.author', 'author')
 
