@@ -3,19 +3,20 @@ import UserEntity from "../user/user.entity";
 import {CreateArticleDto} from "../dto/createArticle.dto";
 import {ArticleEntity} from "./article.entity";
 import {InjectRepository} from "@nestjs/typeorm";
-import {DeleteResult, getConnection, getConnectionManager, getRepository, Repository} from "typeorm";
+import {DeleteResult, Repository} from "typeorm";
 import {ArticleResponseInterface} from "../types/articleResponse.interface";
 import slugify from 'slugify'
 import {ArticlesResponseInterface} from "../types/articlesResponse.interface";
-import {TypeOrmConfig, typeOrmConfigAsync} from "../config/typeorm.config";
 
 @Injectable()
 export class ArticleService {
 
-    constructor(@InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>) {
+    constructor(@InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>,
+                @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>) {
     }
 
-    async findAll(currentUserId: number, query: any):Promise<ArticlesResponseInterface> {
+
+    async findAll(currentUserId: number, query: any): Promise<ArticlesResponseInterface> {
 
         const queryBuilder = this.articleRepository
             .createQueryBuilder('articles')
@@ -25,18 +26,26 @@ export class ArticleService {
 
         const articlesCount = await queryBuilder.getCount()
 
+        if (query.tag) {
+            queryBuilder.andWhere('articles.tagList LIKE :tag', {tag: `%${query.tag}%`})
+        }
 
-        if(query.limit){
+        if (query.author) {
+            const author = await this.userRepository.findOneBy({username: query.author})
+            queryBuilder.andWhere('articles.authorId = :id', {id: author.id})
+        }
+
+        if (query.limit) {
             queryBuilder.limit(query.limit)
         }
 
-        if(query.offset){
+        if (query.offset) {
             queryBuilder.offset(query.offset)
         }
 
         const articles = await queryBuilder.getMany()
 
-        return  {articles, articlesCount}
+        return {articles, articlesCount}
     }
 
 
