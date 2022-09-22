@@ -4,6 +4,7 @@ import {ExpressRequestInterface} from "../../types/expressRequest.interface";
 import {verify} from "jsonwebtoken";
 import {JWT_SECRET} from "../../config";
 import {UserService} from "../user.service";
+import {User} from "../decorators/user.decorator";
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -19,7 +20,9 @@ export class AuthMiddleware implements NestMiddleware {
         const token = req.headers.authorization.split(' ')[1]
         try {
             const decode = verify(token, JWT_SECRET)
-            req.user = await this.userService.findById(decode.id)
+            console.log(decode)
+            req.user = await this.userService.findById(decode.user.id)
+            console.log(req.user)
             next()
         } catch (err) {
             req.user = null;

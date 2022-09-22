@@ -31,6 +31,7 @@ export class UserController {
     @Get()
     @UseGuards(AuthGuard)
     async currentUser(@User() user: UserEntity): Promise<UserResponseInterface> {
+
         return this.userService.buildUserResponse(user)
     }
 

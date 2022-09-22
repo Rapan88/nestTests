@@ -17,11 +17,11 @@ export class UserService {
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
-        const userByEmail = await this.userRepository.findOneBy({
-            email: createUserDto.email,
+        const userByEmail = await this.userRepository.findOne({
+            where: {email: createUserDto.email},
         });
-        const userByUsername = await this.userRepository.findOneBy({
-            username: createUserDto.username,
+        const userByUsername = await this.userRepository.findOne({
+            where: {username: createUserDto.username,}
         });
         if (userByEmail || userByUsername) {
             throw new HttpException('Email or username are taken', HttpStatus.UNPROCESSABLE_ENTITY)
@@ -32,15 +32,16 @@ export class UserService {
         return await this.userRepository.save(newUser);
     }
 
-    findById(id: number): Promise<UserEntity>{
-        return this.userRepository.findOneBy({id})
+    findById(id: number): Promise<UserEntity> {
+        return this.userRepository.findOne({where: {id:id}})
+
     }
 
     generateJwt(user: UserEntity): any {
         return sign({user}, JWT_SECRET)
     }
 
-    async updateUser(userId: number, updateUserDto: UpdateUserDto): Promise<UserEntity>{
+    async updateUser(userId: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
         const user = await this.findById(userId)
         Object.assign(user, updateUserDto)
         return await this.userRepository.save(user)
@@ -57,8 +58,8 @@ export class UserService {
 
     async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
 
-        const user = await this.userRepository.findOneBy(
-            {email: loginUserDto.email})
+        const user = await this.userRepository.findOne(
+            {where: {email: loginUserDto.email}})
         if (!user) {
             throw new HttpException('Credentials are not valid', HttpStatus.UNPROCESSABLE_ENTITY)
         }
